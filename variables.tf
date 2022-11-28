@@ -22,23 +22,15 @@ variable "environment" {
 variable "tags" {
   type = map(string)
   default = {
-    key = "aks"
+    key = "workshop"
   }
 }
 
-variable "tenant_id" {
+variable "kubernetes_cluster_client_id" {
   type = string
 }
 
-variable "subscription_id" {
-  type = string
-}
-
-variable "client_id" {
-  type = string
-}
-
-variable "client_secret" {
+variable "kubernetes_cluster_client_secret" {
   type      = string
   sensitive = true
 }
@@ -86,7 +78,7 @@ variable "kubernetes_cluster_docker_bridge_cidr" {
 
 variable "kubernetes_cluster_default_node_pool_vm_size" {
   type    = string
-  default = "Standard_D2s_v5"
+  default = "Standard_D2d_v5"
 }
 
 variable "kubernetes_cluster_default_node_pool_max_pods" {
@@ -182,12 +174,12 @@ variable "kubernetes_cluster_network_policy" {
 
 variable "kubernetes_cluster_open_service_mesh_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "kubernetes_cluster_microsoft_defender_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "kubernetes_cluster_key_vault_secrets_provider_enabled" {
@@ -202,17 +194,11 @@ variable "kubernetes_cluster_oidc_issuer_enabled" {
 
 variable "kubernetes_cluster_workload_identity_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
-variable "log_analytics_workspace_daily_quota_gb" {
-  type    = number
-  default = 1
-}
-
-variable "log_analytics_workspace_retention_in_days" {
-  type    = number
-  default = 30
+variable "log_analytics_workspace_id" {
+  type = string
 }
 
 variable "container_registry_sku" {
@@ -223,34 +209,4 @@ variable "container_registry_sku" {
 variable "nat_gateway_public_ip_prefix_length" {
   type    = number
   default = 28
-}
-
-variable "kubernetes_service_cluster_administrators" {
-  type    = list(string)
-  default = []
-}
-
-variable "kubernetes_service_cluster_users" {
-  type    = list(string)
-  default = []
-}
-
-variable "kubernetes_service_rbac_administrators" {
-  type    = list(string)
-  default = []
-}
-
-variable "kubernetes_service_rbac_cluster_administrators" {
-  type    = list(string)
-  default = []
-}
-
-variable "kubernetes_service_rbac_readers" {
-  type    = list(string)
-  default = []
-}
-
-variable "kubernetes_service_rbac_writers" {
-  type    = list(string)
-  default = []
 }

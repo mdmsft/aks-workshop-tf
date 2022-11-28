@@ -1,7 +1,4 @@
 locals {
-  subnets = [
-    azurerm_subnet.cluster.id
-  ]
   kubernetes_cluster_orchestrator_version                   = var.kubernetes_cluster_orchestrator_version == null ? data.azurerm_kubernetes_service_versions.main.latest_version : var.kubernetes_cluster_orchestrator_version
   kubernetes_cluster_default_node_pool_orchestrator_version = var.kubernetes_cluster_default_node_pool_orchestrator_version == null ? local.kubernetes_cluster_orchestrator_version : var.kubernetes_cluster_default_node_pool_orchestrator_version
   kubernetes_cluster_node_pool_orchestrator_version         = { for k, v in var.kubernetes_cluster_node_pools : k => v.orchestrator_version == null ? local.kubernetes_cluster_orchestrator_version : v.orchestrator_version }
@@ -23,13 +20,9 @@ resource "azurerm_kubernetes_cluster" "main" {
   sku_tier                          = var.kubernetes_cluster_sku_tier
   workload_identity_enabled         = var.kubernetes_cluster_oidc_issuer_enabled && var.kubernetes_cluster_workload_identity_enabled
 
-  azure_active_directory_role_based_access_control {
-    managed            = true
-    azure_rbac_enabled = true
-  }
-
-  identity {
-    type = "SystemAssigned"
+  service_principal {
+    client_id     = var.kubernetes_cluster_client_id
+    client_secret = var.kubernetes_cluster_client_secret
   }
 
   default_node_pool {
@@ -53,7 +46,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   oms_agent {
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+    log_analytics_workspace_id = var.log_analytics_workspace_id
   }
 
   network_profile {
@@ -104,67 +97,4 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   upgrade_settings {
     max_surge = each.value.max_surge
   }
-}
-
-resource "azurerm_role_assignment" "cluster_network_contributor" {
-  role_definition_name = "Network Contributor"
-  scope                = azurerm_subnet.cluster.id
-  principal_id         = azurerm_kubernetes_cluster.main.identity.0.principal_id
-}
-
-resource "azurerm_role_assignment" "cluster_registry_pull" {
-  role_definition_name = "AcrPull"
-  scope                = azurerm_container_registry.main.id
-  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
-}
-
-resource "null_resource" "kube_config" {
-  triggers = {
-    cluster = azurerm_kubernetes_cluster.main.id
-  }
-  provisioner "local-exec" {
-    command = "echo \"${azurerm_kubernetes_cluster.main.kube_config_raw}\" | tee .kubeconfig"
-  }
-}
-
-resource "azurerm_role_assignment" "aks_cluster_administrator" {
-  for_each             = toset(var.kubernetes_service_cluster_administrators)
-  role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
-}
-
-resource "azurerm_role_assignment" "kubernetes_service_cluster_user" {
-  for_each             = toset(var.kubernetes_service_cluster_users)
-  role_definition_name = "Azure Kubernetes Service Cluster User Role"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
-}
-
-resource "azurerm_role_assignment" "kubernetes_service_rbac_administrator" {
-  for_each             = toset(var.kubernetes_service_rbac_administrators)
-  role_definition_name = "Azure Kubernetes Service RBAC Admin"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
-}
-
-resource "azurerm_role_assignment" "kubernetes_service_rbac_cluster_administrator" {
-  for_each             = toset(var.kubernetes_service_rbac_cluster_administrators)
-  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
-}
-
-resource "azurerm_role_assignment" "kubernetes_service_rbac_reader" {
-  for_each             = toset(var.kubernetes_service_rbac_readers)
-  role_definition_name = "Azure Kubernetes Service RBAC Reader"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
-}
-
-resource "azurerm_role_assignment" "kubernetes_service_rbac_writer" {
-  for_each             = toset(var.kubernetes_service_rbac_writers)
-  role_definition_name = "Azure Kubernetes Service RBAC Writer"
-  principal_id         = each.value
-  scope                = azurerm_kubernetes_cluster.main.id
 }
