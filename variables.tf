@@ -26,6 +26,15 @@ variable "tags" {
   }
 }
 
+variable "client_id" {
+  type = string
+}
+
+variable "client_secret" {
+  type      = string
+  sensitive = true
+}
+
 variable "kubernetes_cluster_client_id" {
   type = string
 }
