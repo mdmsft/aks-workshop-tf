@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~>3.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~>2.0"
+    }
   }
   backend "azurerm" {
     container_name = "tfstate"
@@ -43,4 +47,10 @@ provider "azuread" {
   client_id     = var.client_id
   client_secret = var.client_secret
   tenant_id     = var.tenant_id
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = ".kube/config"
+  }
 }

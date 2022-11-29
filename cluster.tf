@@ -109,3 +109,23 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
     ]
   }
 }
+
+resource "local_file" "kube_config" {
+  filename = ".kube/config"
+  content  = azurerm_kubernetes_cluster.main.kube_admin_config_raw
+}
+
+resource "helm_release" "nginx" {
+  name             = "ingress-nginx"
+  repository       = "https://kubernetes.github.io/ingress-nginx"
+  chart            = "ingress-nginx"
+  namespace        = "ingress-nginx"
+  create_namespace = true
+  cleanup_on_fail  = true
+  atomic           = true
+  wait             = true
+
+  depends_on = [
+    local_file.kube_config
+  ]
+}
