@@ -5,4 +5,10 @@ resource "azurerm_container_registry" "main" {
   sku                    = var.container_registry_sku
   admin_enabled          = true
   anonymous_pull_enabled = false
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }

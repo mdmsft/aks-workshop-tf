@@ -3,6 +3,12 @@ resource "azurerm_virtual_network" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   address_space       = [var.address_space]
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_subnet" "cluster" {
@@ -19,6 +25,12 @@ resource "azurerm_public_ip_prefix" "cluster" {
   prefix_length       = var.nat_gateway_public_ip_prefix_length
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_nat_gateway" "cluster" {
@@ -27,6 +39,12 @@ resource "azurerm_nat_gateway" "cluster" {
   resource_group_name     = azurerm_resource_group.main.name
   idle_timeout_in_minutes = 4
   sku_name                = "Standard"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_nat_gateway_public_ip_prefix_association" "cluster" {

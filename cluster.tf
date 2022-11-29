@@ -73,6 +73,12 @@ resource "azurerm_kubernetes_cluster" "main" {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
@@ -96,5 +102,11 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 
   upgrade_settings {
     max_surge = each.value.max_surge
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
   }
 }
