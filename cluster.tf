@@ -2,6 +2,8 @@ locals {
   kubernetes_cluster_orchestrator_version                   = var.kubernetes_cluster_orchestrator_version == null ? data.azurerm_kubernetes_service_versions.main.latest_version : var.kubernetes_cluster_orchestrator_version
   kubernetes_cluster_default_node_pool_orchestrator_version = var.kubernetes_cluster_default_node_pool_orchestrator_version == null ? local.kubernetes_cluster_orchestrator_version : var.kubernetes_cluster_default_node_pool_orchestrator_version
   kubernetes_cluster_node_pool_orchestrator_version         = { for k, v in var.kubernetes_cluster_node_pools : k => v.orchestrator_version == null ? local.kubernetes_cluster_orchestrator_version : v.orchestrator_version }
+  tls_secret_name                                           = "wildcard"
+  tls_secret_namespace                                      = "ingress-nginx"
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
@@ -129,12 +131,32 @@ resource "helm_release" "nginx" {
     templatefile("./k8s/nginx.values.yaml",
       {
         load_balancer_ip_address             = azurerm_public_ip.nginx.ip_address,
-        load_balancer_ip_resource_group_name = azurerm_resource_group.main.name
+        load_balancer_ip_resource_group_name = azurerm_resource_group.main.name,
+        tls_secret_namespace                 = local.tls_secret_namespace
+        tls_secret_name                      = local.tls_secret_name
     })
   ]
 
   depends_on = [
     local_file.kube_config,
     azurerm_public_ip.nginx
+  ]
+}
+
+resource "kubernetes_secret_v1" "nginx" {
+  metadata {
+    name      = local.tls_secret_name
+    namespace = local.tls_secret_namespace
+  }
+
+  data = {
+    "tls.crt" = file(var.tls_certificate_path)
+    "tls.key" = file(var.tls_key_path)
+  }
+
+  type = "kubernetes.io/tls"
+
+  depends_on = [
+    helm_release.nginx
   ]
 }

@@ -24,7 +24,7 @@ controller:
   extraArgs:
     http-port: 9080
     https-port: 9443
-    # default-ssl-certificate: ingress-nginx/aks-sandbox-01-wildlcard-tls-secret
+    default-ssl-certificate: ${tls_secret_namespace}/${tls_secret_name}
     # enable-ssl-passthrough: true
   service:
     loadBalancerIP: ${load_balancer_ip_address}

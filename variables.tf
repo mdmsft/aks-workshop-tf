@@ -228,6 +228,14 @@ variable "nat_gateway_public_ip_prefix_length" {
   default = 28
 }
 
+variable "tls_certificate_path" {
+  type = string
+}
+
+variable "tls_key_path" {
+  type = string
+}
+
 # variable "log_analytics_workspace_name" {
 #   type = string
 # }
