@@ -64,4 +64,10 @@ resource "azurerm_public_ip" "nginx" {
   allocation_method   = "Static"
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
