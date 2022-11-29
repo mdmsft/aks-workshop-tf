@@ -14,7 +14,6 @@ resource "azurerm_kubernetes_cluster" "main" {
   azure_policy_enabled              = var.kubernetes_cluster_azure_policy_enabled
   open_service_mesh_enabled         = var.kubernetes_cluster_open_service_mesh_enabled
   kubernetes_version                = local.kubernetes_cluster_orchestrator_version
-  local_account_disabled            = true
   oidc_issuer_enabled               = var.kubernetes_cluster_oidc_issuer_enabled
   node_resource_group               = "rg-${local.resource_suffix}-aks"
   sku_tier                          = var.kubernetes_cluster_sku_tier
