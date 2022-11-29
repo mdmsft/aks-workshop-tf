@@ -35,6 +35,14 @@ variable "client_secret" {
   sensitive = true
 }
 
+variable "subscription_id" {
+  type = string
+}
+
+variable "tenant_id" {
+  type = string
+}
+
 variable "kubernetes_cluster_client_id" {
   type = string
 }
