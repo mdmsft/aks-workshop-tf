@@ -28,6 +28,7 @@ controller:
     # enable-ssl-passthrough: true
   service:
     loadBalancerIP: ${load_balancer_ip_address}
+    externalTrafficPolicy: Local
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-resource-group: ${load_balancer_ip_resource_group_name}
       service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
