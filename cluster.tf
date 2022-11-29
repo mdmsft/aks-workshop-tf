@@ -126,7 +126,11 @@ resource "helm_release" "nginx" {
   wait             = true
 
   values = [
-    templatefile("./k8s/nginx.values.yaml", { load_balancer_ip_address = azurerm_public_ip.nginx.ip_address })
+    templatefile("./k8s/nginx.values.yaml",
+      {
+        load_balancer_ip_address             = azurerm_public_ip.nginx.ip_address,
+        load_balancer_ip_resource_group_name = azurerm_resource_group.main.name
+    })
   ]
 
   depends_on = [
