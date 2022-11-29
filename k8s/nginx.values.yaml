@@ -26,6 +26,8 @@ controller:
     https-port: 9443
     # default-ssl-certificate: ingress-nginx/aks-sandbox-01-wildlcard-tls-secret
     # enable-ssl-passthrough: true
+  service:
+    loadBalancerIP: ${load_balancer_ip_address}
   admissionWebhooks:
     patch:
       securityContext:

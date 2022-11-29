@@ -56,3 +56,12 @@ resource "azurerm_subnet_nat_gateway_association" "cluster" {
   nat_gateway_id = azurerm_nat_gateway.cluster.id
   subnet_id      = azurerm_subnet.cluster.id
 }
+
+resource "azurerm_public_ip" "nginx" {
+  name                = "pip-${local.resource_suffix}-nginx"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  zones               = ["1", "2", "3"]
+}
