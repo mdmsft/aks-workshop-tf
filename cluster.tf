@@ -112,7 +112,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 
 resource "local_file" "kube_config" {
   filename = ".kube/config"
-  content  = azurerm_kubernetes_cluster.main.kube_admin_config_raw
+  content  = azurerm_kubernetes_cluster.main.kube_config_raw
 }
 
 resource "helm_release" "nginx" {
@@ -124,6 +124,10 @@ resource "helm_release" "nginx" {
   cleanup_on_fail  = true
   atomic           = true
   wait             = true
+
+  values = [
+    templatefile("./k8s/nginx.values.yaml", {})
+  ]
 
   depends_on = [
     local_file.kube_config

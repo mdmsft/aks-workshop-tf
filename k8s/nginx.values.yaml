@@ -1,0 +1,35 @@
+controller:
+  image:
+    allowPrivilegeEscalation: false
+  containerPort:
+    http: 9080
+    https: 9443
+  ingressClassResource:
+    default: true
+  podSecurityContext:
+    fsGroup: 101
+    supplementalGroups: [101]
+    seccompProfile:
+      type: RuntimeDefault
+    runAsNonRoot: true
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      add:
+      - NET_BIND_SERVICE
+      drop:
+      - ALL
+    runAsUser: 101
+    runAsGroup: 101
+  extraArgs:
+    http-port: 9080
+    https-port: 9443
+    # default-ssl-certificate: ingress-nginx/aks-sandbox-01-wildlcard-tls-secret
+    # enable-ssl-passthrough: true
+  admissionWebhooks:
+    patch:
+      securityContext:
+        supplementalGroups: [2000]
+        seccompProfile:
+          type: RuntimeDefault
+        runAsGroup: 2000 
