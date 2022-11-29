@@ -30,6 +30,7 @@ controller:
     loadBalancerIP: ${load_balancer_ip_address}
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-resource-group: ${load_balancer_ip_resource_group_name}
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
   admissionWebhooks:
     patch:
       securityContext:
