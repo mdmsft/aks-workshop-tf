@@ -227,3 +227,15 @@ variable "nat_gateway_public_ip_prefix_length" {
   type    = number
   default = 28
 }
+
+# variable "log_analytics_workspace_name" {
+#   type = string
+# }
+
+# variable "log_analytics_workspace_resource_group_name" {
+#   type = string
+# }
+
+# variable "log_analytics_workspace_subscription_id" {
+#   type = string
+# }
