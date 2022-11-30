@@ -163,8 +163,7 @@ resource "kubernetes_secret_v1" "nginx" {
 
 resource "kubernetes_secret_v1" "docker" {
   metadata {
-    name      = local.tls_secret_name
-    namespace = local.tls_secret_namespace
+    name = "docker"
   }
 
   data = {
