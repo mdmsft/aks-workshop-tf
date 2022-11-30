@@ -162,10 +162,10 @@ variable "kubernetes_cluster_node_pools" {
   }))
   default = {
     workload = {
-      max_count            = 3
+      max_count            = 6
       max_pods             = 30
       max_surge            = "33%"
-      min_count            = 0
+      min_count            = 3
       node_labels          = {}
       node_taints          = []
       orchestrator_version = null
