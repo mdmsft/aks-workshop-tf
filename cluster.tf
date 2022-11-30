@@ -167,13 +167,15 @@ resource "kubernetes_secret_v1" "docker" {
   }
 
   data = {
-    auths = {
-      "${azurerm_container_registry.main.login_server}" = {
-        username = azurerm_container_registry.main.admin_username,
-        password = azurerm_container_registry.main.admin_password,
-        email    = "admin@contoso.com"
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "${azurerm_container_registry.main.login_server}" = {
+          username = azurerm_container_registry.main.admin_username,
+          password = azurerm_container_registry.main.admin_password,
+          email    = "admin@contoso.com"
+        }
       }
-    }
+    })
   }
 
   type = "kubernetes.io/dockerconfigjson"
