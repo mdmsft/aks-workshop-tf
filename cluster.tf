@@ -27,11 +27,6 @@ resource "azurerm_kubernetes_cluster" "main" {
     client_secret = var.kubernetes_cluster_client_secret
   }
 
-  azure_active_directory_role_based_access_control {
-    managed            = true
-    azure_rbac_enabled = true
-  }
-
   default_node_pool {
     name                         = "system"
     vm_size                      = var.kubernetes_cluster_default_node_pool_vm_size
