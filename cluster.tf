@@ -160,3 +160,26 @@ resource "kubernetes_secret_v1" "nginx" {
     helm_release.nginx
   ]
 }
+
+resource "kubernetes_secret_v1" "docker" {
+  metadata {
+    name      = local.tls_secret_name
+    namespace = local.tls_secret_namespace
+  }
+
+  data = {
+    auths = {
+      "${azurerm_container_registry.main.login_server}" = {
+        username = azurerm_container_registry.main.admin_username,
+        password = azurerm_container_registry.main.admin_password,
+        email    = "admin@contoso.com"
+      }
+    }
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  depends_on = [
+    helm_release.nginx
+  ]
+}
