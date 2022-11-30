@@ -4,6 +4,7 @@ locals {
   kubernetes_cluster_node_pool_orchestrator_version         = { for k, v in var.kubernetes_cluster_node_pools : k => v.orchestrator_version == null ? local.kubernetes_cluster_orchestrator_version : v.orchestrator_version }
   tls_secret_name                                           = "wildcard"
   tls_secret_namespace                                      = "ingress-nginx"
+  kubeconfig_path                                           = ".kube/config"
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
@@ -24,6 +25,11 @@ resource "azurerm_kubernetes_cluster" "main" {
   service_principal {
     client_id     = var.kubernetes_cluster_client_id
     client_secret = var.kubernetes_cluster_client_secret
+  }
+
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
   }
 
   default_node_pool {
@@ -113,8 +119,15 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 }
 
 resource "local_file" "kube_config" {
-  filename = ".kube/config"
+  filename = local.kubeconfig_path
   content  = azurerm_kubernetes_cluster.main.kube_config_raw
+
+  provisioner "local-exec" {
+    command = "kubelogin convert-kubeconfig -l spn --client-id ${var.client_id} --client-secret ${var.client_secret}"
+    environment = {
+      KUBECONFIG = local.kubeconfig_path
+    }
+  }
 }
 
 resource "helm_release" "nginx" {
