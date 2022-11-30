@@ -130,11 +130,15 @@ resource "local_file" "kube_config" {
   }
 }
 
+data "azuread_service_principal" "service_principal" {
+  application_id = var.client_id
+}
+
 resource "azurerm_role_assignment" "cluster_admin" {
   provider             = azurerm.rbac
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   scope                = azurerm_kubernetes_cluster.main.id
-  principal_id         = data.azuread_client_config.main.object_id
+  principal_id         = data.azuread_service_principal.service_principal.object_id
 }
 
 resource "helm_release" "nginx" {
