@@ -129,8 +129,8 @@ resource "azurerm_resource_policy_assignment" "cluster_allowed_registry" {
   resource_id          = azurerm_kubernetes_cluster.main.id
   parameters           = <<EOF
     {
-      allowedContainerImagesRegex: {
-        value: "^${azurerm_container_registry.main.login_server}\\/.+$"
+      "allowedContainerImagesRegex": {
+        "value": "^${azurerm_container_registry.main.login_server}\\/.+$"
       }
     }
   EOF
