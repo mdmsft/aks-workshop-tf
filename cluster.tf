@@ -121,20 +121,19 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 resource "local_file" "kube_config" {
   filename = local.kubeconfig_path
   content  = azurerm_kubernetes_cluster.main.kube_config_raw
-
-  provisioner "local-exec" {
-    command = "kubelogin convert-kubeconfig -l spn --client-id ${var.client_id} --client-secret ${var.client_secret}"
-    environment = {
-      KUBECONFIG = local.kubeconfig_path
-    }
-  }
 }
 
-resource "azurerm_role_assignment" "cluster_admin" {
-  provider             = azurerm.rbac
-  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  scope                = azurerm_kubernetes_cluster.main.id
-  principal_id         = data.azuread_client_config.main.object_id
+resource "azurerm_resource_policy_assignment" "cluster_allowed_registry" {
+  policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/febd0533-8e55-448f-b837-bd0e06f16469"
+  name                 = "Allow only one registry"
+  resource_id          = azurerm_kubernetes_cluster.main.id
+  parameters           = <<EOF
+    {
+      allowedContainerImagesRegex: {
+        value: "^${azurerm_container_registry.main.login_server}\\/.+$"
+      }
+    }
+  EOF
 }
 
 resource "helm_release" "nginx" {
@@ -160,7 +159,6 @@ resource "helm_release" "nginx" {
   depends_on = [
     local_file.kube_config,
     azurerm_public_ip.nginx,
-    azurerm_role_assignment.cluster_admin
   ]
 }
 
